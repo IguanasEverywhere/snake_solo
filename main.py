@@ -1,4 +1,6 @@
 from turtle import Turtle, Screen
+from tkinter import messagebox
+import random
 
 screen = Screen()
 screen.screensize(800, 800)
@@ -38,7 +40,7 @@ def move_snake():
     move_up()
   if direction == "d":
     move_down()
-  screen.ontimer(move_snake, 50)
+  screen.ontimer(move_snake, 100)
 
 
 def move_left():
@@ -46,6 +48,7 @@ def move_left():
   snake_blocks.insert(0, snake_blocks[last_pos])
   snake_blocks.pop()
   snake_blocks[0].setpos(snake_blocks[1].xcor() - 20, snake_blocks[1].ycor())
+  check_status()
 
 
 def move_right():
@@ -53,13 +56,14 @@ def move_right():
   snake_blocks.insert(0, snake_blocks[last_pos])
   snake_blocks.pop()
   snake_blocks[0].setpos(snake_blocks[1].xcor() + 20, snake_blocks[1].ycor())
-
+  check_status()
 
 def move_down():
   last_pos = len(snake_blocks) - 1
   snake_blocks.insert(0, snake_blocks[last_pos])
   snake_blocks.pop()
   snake_blocks[0].setpos(snake_blocks[1].xcor(), snake_blocks[1].ycor() - 20)
+  check_status()
 
 
 def move_up():
@@ -67,6 +71,7 @@ def move_up():
   snake_blocks.insert(0, snake_blocks[last_pos])
   snake_blocks.pop()
   snake_blocks[0].setpos(snake_blocks[1].xcor(), snake_blocks[1].ycor() + 20)
+  check_status()
 
 
 def grow_body():
@@ -79,6 +84,42 @@ def grow_body():
   snake_blocks.append(new_block)
   new_block.color("blue", "green")
   new_block.st()
+
+def game_over(loss_reason):
+  screen.bgcolor("red")
+  play_again = messagebox.askyesno("Game over!", f"You hit {loss_reason}! Play again?")
+  if not play_again:
+      screen.bye()
+  else:
+    pass
+    # we'll need to have a way of resetting everything back to initial states here
+
+def check_status():
+  if ((snake_blocks[0].xcor() <= -400) or
+      (snake_blocks[0].xcor() >= 400) or
+      (snake_blocks[0].ycor() <= -400) or
+      (snake_blocks[0].ycor() >= 400)):
+    game_over("a wall")
+
+  for block in snake_blocks[1:]:
+    if block.pos() == snake_blocks[0].pos():
+      game_over("yourself")
+
+  if snake_blocks[0].pos() == apple.pos():
+    grow_body()
+    place_apple()
+
+def place_apple():
+  random_x = random.randint(0, 380)
+  random_y = random.randint(0, 380)
+
+  while random_x % 20 != 0:
+    random_x -= 1
+  while random_y % 20 != 0:
+    random_y -= 1
+
+  apple.setpos(random_x, random_y)
+
 
 head = Turtle()
 head.shape("square")
@@ -105,6 +146,13 @@ tail.penup()
 tail.setpos(40, 0)
 tail.speed(0)
 
+apple = Turtle()
+apple.shape("square")
+apple.color("brown", "brown")
+apple.shapesize(outline=2)
+apple.penup()
+apple.speed(0)
+place_apple()
 
 snake_blocks.append(head)
 snake_blocks.append(mid)
