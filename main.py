@@ -1,6 +1,7 @@
 from turtle import Turtle, Screen
 from tkinter import messagebox
 import random
+from collections import deque
 
 screen = Screen()
 screen.screensize(800, 800)
@@ -11,67 +12,61 @@ snake_blocks = []
 
 direction = ""
 
+accept_input = True
+
+# moves_queue = deque()
+
 def change_direction_left():
-  global direction
-  if direction!= "r":
-    direction = "l"
+  global accept_input
+  if accept_input:
+    global direction
+    if direction!= "r":
+      direction = "l"
+      accept_input = False
 
 def change_direction_up():
-  global direction
-  if direction != "d":
-    direction = "u"
+  global accept_input
+  if accept_input:
+    global direction
+    if direction != "d":
+      direction = "u"
+      accept_input = False
 
 def change_direction_right():
-  global direction
-  if direction != "l":
-    direction = "r"
+  global accept_input
+  if accept_input:
+    global direction
+    if direction != "l":
+      direction = "r"
+    accept_input = False
 
 def change_direction_down():
-  global direction
-  if direction != "u":
-    direction = "d"
+  global accept_input
+  if accept_input:
+    global direction
+    if direction != "u":
+      direction = "d"
+      accept_input = False
+
 
 def move_snake():
+  global accept_input
+  last_pos = len(snake_blocks) - 1
+  snake_blocks.insert(0, snake_blocks[last_pos])
+  snake_blocks.pop()
   if direction == "l":
-    move_left()
+    snake_blocks[0].setpos(snake_blocks[1].xcor() - 20, snake_blocks[1].ycor())
   if direction == "r":
-    move_right()
+    snake_blocks[0].setpos(snake_blocks[1].xcor() + 20, snake_blocks[1].ycor())
   if direction == "u":
-    move_up()
+    snake_blocks[0].setpos(snake_blocks[1].xcor(), snake_blocks[1].ycor() + 20)
   if direction == "d":
-    move_down()
-  screen.ontimer(move_snake, 100)
+    snake_blocks[0].setpos(snake_blocks[1].xcor(), snake_blocks[1].ycor() - 20)
 
-
-def move_left():
-  last_pos = len(snake_blocks) - 1
-  snake_blocks.insert(0, snake_blocks[last_pos])
-  snake_blocks.pop()
-  snake_blocks[0].setpos(snake_blocks[1].xcor() - 20, snake_blocks[1].ycor())
   check_status()
+  accept_input = True
 
-
-def move_right():
-  last_pos = len(snake_blocks) - 1
-  snake_blocks.insert(0, snake_blocks[last_pos])
-  snake_blocks.pop()
-  snake_blocks[0].setpos(snake_blocks[1].xcor() + 20, snake_blocks[1].ycor())
-  check_status()
-
-def move_down():
-  last_pos = len(snake_blocks) - 1
-  snake_blocks.insert(0, snake_blocks[last_pos])
-  snake_blocks.pop()
-  snake_blocks[0].setpos(snake_blocks[1].xcor(), snake_blocks[1].ycor() - 20)
-  check_status()
-
-
-def move_up():
-  last_pos = len(snake_blocks) - 1
-  snake_blocks.insert(0, snake_blocks[last_pos])
-  snake_blocks.pop()
-  snake_blocks[0].setpos(snake_blocks[1].xcor(), snake_blocks[1].ycor() + 20)
-  check_status()
+  screen.ontimer(move_snake, 50)
 
 
 def grow_body():
@@ -162,6 +157,7 @@ screen.onkey(change_direction_left, "a")
 screen.onkey(change_direction_up, "w")
 screen.onkey(change_direction_right, "d")
 screen.onkey(change_direction_down, "s")
+
 screen.onkey(grow_body, "l")
 
 move_snake()
